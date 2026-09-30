@@ -39,6 +39,9 @@ comparison moot; Qwen3 covers the multilingual axis.
 
 ## Phase 4 — Journal v1 (tiny on purpose) — NEXT UP
 
+Full plans: `docs/journal-v1-plan.md` (engineering) + `docs/UI-STITCH-PLAN.md`
+(UI via Google Stitch, stock-Android design system + 6 screen prompts).
+
 ```
 record → stop → transcribe → edit → save (audio + text + metadata)
 ```
