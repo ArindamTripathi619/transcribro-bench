@@ -13,3 +13,5 @@ apks/
 
 # tooling
 .DS_Store
+models/
+*.tar.bz2
