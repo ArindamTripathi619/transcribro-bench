@@ -10,7 +10,7 @@ NAME="${1:?usage: ingest-recording.sh <name> <index>}"
 IDX="${2:?usage: ingest-recording.sh <name> <index>}"
 
 mapfile -t FILES < <(
-  adb shell 'find /sdcard/Record /sdcard/Records /sdcard/Download /sdcard/Movies /sdcard/DCIM -type f \( -iname "*.m4a" -o -iname "*.mp3" -o -iname "*.wav" -o -iname "*.aac" -o -iname "*.ogg" -o -iname "*.mp4" \) -printf "%T@ %s %p\n" 2>/dev/null' \
+  adb shell 'find /sdcard/Record /sdcard/Records /sdcard/Music/Recorder/records /sdcard/Download /sdcard/Movies /sdcard/DCIM -type f \( -iname "*.m4a" -o -iname "*.mp3" -o -iname "*.wav" -o -iname "*.aac" -o -iname "*.ogg" -o -iname "*.mp4" \) -printf "%T@ %s %p\n" 2>/dev/null' \
     | sort -rn | head -15 \
     | awk '{ $1=""; $2=""; sub(/^ +/, ""); print }'
 )
