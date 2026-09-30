@@ -56,7 +56,11 @@ adb install apks/flutter-vad-non-streaming-asr-from-microphone-nemo-parakeet-v2-
 # 4. run the 5-recording benchmark per PROTOCOL.md, score with rubric.md
 
 # 5. after each session
-./scripts/memwatch.sh <package> 20             # RAM snapshot while model is loaded
+./scripts/memwatch.sh com.example.vad_non_streaming_asr_from_file 20
+./scripts/memwatch.sh com.example.vad_non_streaming_asr_from_microphone 20
+
+# launch either app from laptop
+adb shell monkey -p com.example.vad_non_streaming_asr_from_file -c android.intent.category.LAUNCHER 1
 ```
 
 ## Engines on the shortlist

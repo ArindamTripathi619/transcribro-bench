@@ -19,6 +19,14 @@
 - Started in background into apks/ (file first, then mic). Verify with:
   `ls -la apks/` → both final names present, no `.part` files, sizes ≈ 580 MB / 522 MB.
 
+## Progress (later same morning)
+- Device authorized: `ZA222KBRDB → device`. Profile: moto g34 5G, "fogos", Android 15 (SDK 35),
+  arm64-v8a, 8 cores, MemTotal 7.67 GB, MemAvailable ~2.9 GB, 17 GB free storage, battery 99%.
+- Both APKs downloaded (sizes match server content-length exactly) and installed → `Success`.
+- Package names (v1.13.5, targetSdk 36):
+  - `com.example.vad_non_streaming_asr_from_file`
+  - `com.example.vad_non_streaming_asr_from_microphone`
+
 ## Next actions (user)
 1. Accept USB debugging prompt on phone → `adb devices` shows `device`
 2. `./scripts/device-info.sh` → confirm model/abi/RAM
