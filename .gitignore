@@ -1,0 +1,15 @@
+# personal audio + transcripts never go into git
+recordings/
+transcripts/
+results/
+apks/
+*.wav
+*.m4a
+*.mp3
+*.aac
+*.ogg
+*.apk
+*.part
+
+# tooling
+.DS_Store
