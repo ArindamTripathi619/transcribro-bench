@@ -27,6 +27,14 @@
   - `com.example.vad_non_streaming_asr_from_file`
   - `com.example.vad_non_streaming_asr_from_microphone`
 
+## Recovery check (laptop died, later same day)
+- Laptop rebooted; verified NOTHING was lost: all 6 git commits, all 4 recordings,
+  all 4 parakeet-v2 transcripts, scores.csv (B+/A−/D/D), all 3 APKs in apks/,
+  all 4 WAVs still in /sdcard/Download on phone.
+- Phone still has Qwen3 as the file app (lastUpdateTime 10:39 = Qwen3 install) + Parakeet mic app.
+- Next: run Qwen3 on 05_hinglish.wav + 05b_hinglish_script.wav (both already in
+  /sdcard/Download), time both runs, save txts to Documents.
+
 ## Next actions (user)
 1. Accept USB debugging prompt on phone → `adb devices` shows `device`
 2. `./scripts/device-info.sh` → confirm model/abi/RAM
