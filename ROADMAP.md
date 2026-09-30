@@ -1,39 +1,43 @@
 # ROADMAP
 
-## Phase 0 — device + tooling (tonight)
+## Phase 0 — device + tooling — ✅ DONE
 
-- [ ] ADB authorized (`adb devices` → `device`)
-- [ ] `./scripts/device-info.sh` → confirm arm64-v8a, model, MemTotal
-- [ ] Both Parakeet v2 APKs installed
-- [ ] Mic permission granted to both apps on first launch
+- [x] ADB authorized
+- [x] Device profiled: moto g34 5G ("fogos"), arm64-v8a, 8 cores, 7.67 GB RAM,
+      Android 15, 15+ GB free storage
+- [x] Parakeet v2 APKs installed (file + microphone apps)
 
-## Phase 1 — qualitative smoke test (~10 min)
+## Phase 1 — qualitative smoke test — ✅ DONE
 
-1. Open the **from-file** app, load a short WAV (any speech), confirm transcription works.
-2. Open the **from-microphone** app, speak naturally for ~60 s (do NOT dictate
-   punctuation aloud; Gboard habits don't apply here).
-3. Ask only: *would I trust this for a personal journal?*
+Done implicitly via 01b_short (29 s natural take): A−, zero word errors,
+obviously better than Gboard. Bar met.
 
-Success bar: transcription feels obviously better than Gboard, no fight over
-pauses. If not → re-evaluate engine choice before benchmarking.
+## Phase 2 — benchmark — ✅ DONE (English + Hinglish complete)
 
-## Phase 2 — 5-recording benchmark (see PROTOCOL.md)
+Same audio → every engine. Scored with rubric.md → results/scores.csv.
 
-Same audio → every engine. Score with rubric.md. Fill results/scores.csv.
+Measured on the G34 (Parakeet v2 INT8) and laptop CPU (Qwen3 0.6B INT8):
 
-| Engine | Stage 1 test | Stage 2 test | Stage 3 test |
-|---|---|---|---|
-| Parakeet v2 (en) | sherpa APKs | — | — |
-| Whisper Small | sherpa-onnx model via Termux, or whisper.cpp Android | — | — |
-| Qwen3-ASR 0.6B INT8 | — | sherpa-onnx APK | ~1.9 GB package, Hindi + 52 langs |
-| Moonshine (streaming) | Dicta APK | — | feel-test only |
+| Take | Parakeet v2 | Qwen3 0.6B |
+|---|---|---|
+| 01_normal (72 s en) | B+ · RTF 0.41 cold | — |
+| 01b_short (29 s en) | A− · RTF 0.17 warm | — |
+| 05_hinglish (natural) | **D** — confabulation | C+ · RTF 0.32 |
+| 05b_hinglish (scripted, GT) | **D** — 60% silent omission | **A−** · RTF 0.85 |
 
-## Phase 3 — decision
+Not run (optional): 02_pauses, 03_fast, 04_technical.
+Whisper Small dropped from the plan — Parakeet's English results made the
+comparison moot; Qwen3 covers the multilingual axis.
 
-Write `notes/<date>-decision.md`: chosen engine, scores, RTF, RAM, gut feel.
-Thresholds: RTF ≤ 1.0 usable · ≤ 0.5 comfortable · RAM ≤ ~1.5 GB on 8 GB device.
+## Phase 3 — decision — ✅ DONE (see notes/2026-09-30-qwen3-laptop-bench.md)
 
-## Phase 4 — Journal v1 (tiny on purpose)
+- **English → Parakeet TDT 0.6B v2** (on-device, RTF 0.14 warm, ~1.1 GB RAM)
+- **Hinglish → Qwen3-ASR 0.6B INT8** (laptop-validated; on-device blocked by the
+  upstream APK packaging bug — notes/bug-report-sherpa-onnx-qwen3-apk.md)
+- Moonshine dropped: streaming is not needed for journaling.
+- Thresholds all met for the chosen path (RTF ≤ 1.0 usable · RAM ≤ 1.5 GB).
+
+## Phase 4 — Journal v1 (tiny on purpose) — NEXT UP
 
 ```
 record → stop → transcribe → edit → save (audio + text + metadata)
@@ -57,20 +61,26 @@ interface ASREngine {
 Reference code to study before writing UI: **Muesli android** (voice notes →
 Parakeet → Room, source-only, build from source) and **Dicta** (Moonshine).
 
+On-device Qwen3 options, in order of preference:
+1. Upstream fixes the Qwen3 APK packaging bug → install fixed APK, measure RTF/RAM
+2. Custom APK: sherpa-onnx AAR + model files with tokenizer bundled correctly
+3. Ship v1 English-only with Parakeet; add Hindi mode when (1) or (2) lands
+
 ## Phase 5 — later
 
 - Re-transcription of old entries with a better engine (audio retained)
-- Local LLM cleanup pass (titles/mood/topics) — deliberately skipped in v1
-- Multilingual: Qwen3-ASR 0.6B INT8 if Hindi/code-switching matters day-to-day
+- Local LLM cleanup pass (titles/mood/topics, filler-word removal) — skipped in v1
+  (note: Parakeet keeps "uh"s verbatim; cleanup is a language-model job)
+- Qwen3 `hotwords` parameter to fix proper-noun errors (ONNX, Parakeet, names)
+- VAD tuning from benchmark evidence: fewer/longer segments, lead-in padding to
+  stop first-word loss
 
-## Model shortlist (evidence so far)
+## Model shortlist (final, with measured data)
 
-| Model | Size | Notes |
+| Model | Size | Status |
 |---|---|---|
-| Parakeet TDT 0.6B v2 | ~640 MB INT8 | en-only; Galaxy S10 RTF ≈ 0.09; runs on 2 GB phones |
-| Whisper Small | ~180–490 MB | multilingual; S10 RTF ≈ 0.41 |
-| Qwen3-ASR 0.6B INT8 | ~1.9 GB | 52 langs incl. Hindi; S10 RTF ≈ 0.53 (ONNX INT8 only!) |
-| Whisper Large-v3-Turbo Q5 | ~547 MB | stretch experiment |
-| Moonshine Small/Med Streaming | 158/289 MB | streaming feel, lower accuracy ceiling |
-
-Numbers are comparative evidence, not G34 predictions. Measure on the G34.
+| Parakeet TDT 0.6B v2 | ~640 MB INT8 | **CHOSEN (English)** — G34: RTF 0.14–0.41, 1.0–1.14 GB RAM |
+| Qwen3-ASR 0.6B INT8 | ~880 MB compressed / ~960 MB disk | **CHOSEN (Hinglish)** — laptop RTF 0.32–0.85; on-device pending |
+| Whisper Small | ~180–490 MB | dropped — no remaining question it answers |
+| Whisper Large-v3-Turbo Q5 | ~547 MB | dropped — stretch experiment, not needed |
+| Moonshine Small/Med Streaming | 158/289 MB | dropped — streaming not required for journaling |
